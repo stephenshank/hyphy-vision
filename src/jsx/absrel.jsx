@@ -1,7 +1,6 @@
 var _ = require("underscore");
 
 require("phylotree");
-require("phylotree.css");
 
 import React from "react";
 import ReactDOM from "react-dom";

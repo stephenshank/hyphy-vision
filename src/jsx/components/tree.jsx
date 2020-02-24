@@ -6,7 +6,6 @@ var d3_save_svg = require("d3-save-svg");
 import { saveSvgAsPng } from "save-svg-as-png";
 
 require("phylotree");
-require("phylotree.css");
 
 var Tree = createReactClass({
   getDefaultProps: function() {

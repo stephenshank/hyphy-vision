@@ -9,7 +9,7 @@ React-router-hash-link is therefore used for Windows-Electron and
 react-scrollchor is used for every other platform.
 */
 
-const configFile = require("../../../config.json");
+const configFile = {};
 
 function ScrollSpy(props) {
   var list_items = props.info.map(function(item, index) {

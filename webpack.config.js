@@ -1,7 +1,6 @@
 var path = require("path"),
   webpack = require("webpack"),
   cloneDeep = require("lodash.clonedeep"),
-  ExtractTextPlugin = require("extract-text-webpack-plugin"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
   { BaseHrefWebpackPlugin } = require("base-href-webpack-plugin");
 
@@ -30,11 +29,8 @@ config = {
         }
       },
       {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader"
-        })
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"]
       },
       {
         test: require.resolve("jquery"),
@@ -84,22 +80,10 @@ config = {
         exclude: /node_modules/,
         loader: "eslint-loader",
         options: {}
-      },
-      {
-        test: /\.scss?$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: ["css-loader", "sass-loader"]
-        })
-      },
-      {
-        test: /\.json$/,
-        loader: "json-loader"
       }
     ]
   },
   plugins: [
-    new BaseHrefWebpackPlugin({ baseHref: "." }),
     new HtmlWebpackPlugin({ title: "HyPhy Vision" }),
     new webpack.LoaderOptionsPlugin({ debug: true }),
     //new webpack.optimize.CommonsChunkPlugin({
@@ -114,12 +98,7 @@ config = {
       datamonkey: "datamonkey",
       _: "underscore"
     }),
-    new webpack.IgnorePlugin(/jsdom$/),
-    new HtmlWebpackPlugin({
-      title: "HyPhy Vision",
-      filename: path.resolve("public", "index.html")
-    }),
-    new ExtractTextPlugin("[name].css")
+    new webpack.IgnorePlugin(/jsdom$/)
   ],
   resolve: {
     alias: {
