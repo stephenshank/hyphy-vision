@@ -20,10 +20,6 @@ import {
 import { ResultsPage } from "./components/results_page.jsx";
 import PropTypes from "prop-types";
 import { saveSvgAsPng } from "save-svg-as-png";
-import Phylotree, { placenodes, phylotreev1 } from "react-phylotree";
-import { SitePlotAxis, fastaParser, colors } from "alignment.js";
-import CodonColumn from "./components/codon_column.jsx";
-import AlignmentTree from "./components/tree-alignment.jsx";
 
 require("../datamonkey/helpers.js");
 
@@ -1414,22 +1410,6 @@ class SLACContents extends React.Component {
                 color_gradient={["#00a99d", "#000000"]}
                 grayscale_gradient={["#444444", "#000000"]}
                 multitree
-              />
-            </div>
-          </div>
-
-          <div className="row">
-            <div id="phylo-alignment" className="col-md-12">
-              <Header
-                title="SLAC Phylogenetic Alignment"
-                popover="<ul><li>View individual codons and amino acids with corresponding phylogenetic information.</li><li>Select individual sites and view substitution counts across the phylogeny.</li></ul>"
-              />
-              <AlignmentTree
-                fasta={fasta}
-                newick={newick}
-                syn_substitutions={syn_substitutions}
-                nonsyn_substitutions={nonsyn_substitutions}
-                branchAttributes={branch_attributes}
               />
             </div>
           </div>

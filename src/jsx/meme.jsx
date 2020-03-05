@@ -3,10 +3,24 @@ var React = require("react"),
   d3 = require("d3"),
   _ = require("underscore");
 
-import { Tree } from "./components/tree.jsx";
+import ReactTree from "./components/react-tree.jsx";
 import { DatamonkeyTable, DatamonkeyModelTable } from "./components/tables.jsx";
 import { DatamonkeySiteGraph } from "./components/graphs.jsx";
 import { ResultsPage } from "./components/results_page.jsx";
+
+function MEMETree(props) {
+  if (!props.data) return null;
+  const newick = props.data.input.trees["0"];
+  return (
+    <ReactTree
+      newick={newick}
+      number_of_sequences={props.data.input["number of sequences"]}
+      popover={
+        "<li>Use the options menu to toggle the different site partitions.</li>"
+      }
+    />
+  );
+}
 
 function MEMESummary(props) {
   var number_of_sites = 0;
@@ -47,7 +61,8 @@ function MEMESummary(props) {
               min="0"
               max="1"
               onChange={props.updatePValue}
-            />.
+            />
+            .
           </p>
           <hr />
           <p>
@@ -57,7 +72,8 @@ function MEMESummary(props) {
                 here
               </a>{" "}
               for more information about the MEME method.
-              <br />Please cite{" "}
+              <br />
+              Please cite{" "}
               <a
                 href="http://www.ncbi.nlm.nih.gov/pubmed/22807683"
                 id="summary-pmid"
@@ -270,13 +286,7 @@ class MEMEContents extends React.Component {
 
         <div className="row">
           <div id="tree-tab" className="col-md-12">
-            <Tree
-              models={models}
-              json={self.state.data}
-              settings={tree_settings}
-              method={"meme"}
-              multitree
-            />
+            <MEMETree data={self.state.data} />
           </div>
         </div>
 
