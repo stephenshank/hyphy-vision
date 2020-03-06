@@ -1,22 +1,41 @@
-var React = require("react"),
-  ReactDOM = require("react-dom"),
+import React, { useState } from "react";
+var ReactDOM = require("react-dom"),
   d3 = require("d3"),
   _ = require("underscore");
 
-import ReactTree from "./components/react-tree.jsx";
+import ReactTree, { ModelsPartitionsList } from "./components/react-tree.jsx";
 import { DatamonkeyTable, DatamonkeyModelTable } from "./components/tables.jsx";
 import { DatamonkeySiteGraph } from "./components/graphs.jsx";
 import { ResultsPage } from "./components/results_page.jsx";
 
 function MEMETree(props) {
-  if (!props.data) return null;
-  const newick = props.data.input.trees["0"];
+  const [partition, setPartition] = useState(0);
+  const [model, setModel] = useState("Global MG94xREV");
+  const { data } = props;
+  if (!data) return null;
+  const newick = data.input.trees[String(partition)];
+  function accessor(node) {
+    const name = node.data.name,
+      attributes = data["branch attributes"][String(partition)],
+      branch_length = attributes[name][model];
+    return branch_length;
+  }
   return (
     <ReactTree
       newick={newick}
+      accessor={accessor}
       number_of_sequences={props.data.input["number of sequences"]}
       popover={
         "<li>Use the options menu to toggle the different site partitions.</li>"
+      }
+      options={
+        <ModelsPartitionsList
+          number_of_partitions={_.keys(data.input.trees).length}
+          partition={partition}
+          setPartition={setPartition}
+          model={model}
+          setModel={setModel}
+        />
       }
     />
   );

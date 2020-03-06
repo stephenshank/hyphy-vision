@@ -8,6 +8,50 @@ import { saveSvgAsPng } from "save-svg-as-png";
 require("phylotree");
 require("phylotree.css");
 
+function ModelsPartitionsList(props) {
+  return (
+    <ul className="dropdown-menu" id="hyphy-tree-model-list">
+      <li className="dropdown-header" key="partitions">
+        Partitions
+      </li>
+      {Array(props.number_of_partitions)
+        .fill()
+        .map((d, i) => {
+          return (
+            <li
+              style={{
+                backgroundColor: i == props.partition ? "lightGrey" : "white"
+              }}
+              key={i}
+            >
+              <a href="javascript:;" onClick={() => props.setPartition(i)}>
+                {i + 1}
+              </a>
+            </li>
+          );
+        })}
+      <li role="separator" className="divider" key="divider" />
+      <li className="dropdown-header" key="dropdown-header">
+        Models
+      </li>
+      {["Global MG94xREV", "Nucleotide GTR"].map((d, i) => {
+        return (
+          <li
+            style={{
+              backgroundColor: d == props.model ? "lightGrey" : "white"
+            }}
+            key={i}
+          >
+            <a href="javascript:;" onClick={() => props.setModel(d)}>
+              {d}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 class ReactTree extends Component {
   constructor(props) {
     super(props);
@@ -65,7 +109,7 @@ class ReactTree extends Component {
       total_number_of_sequences = this.state.showInternal
         ? 2 * number_of_sequences - 2
         : number_of_sequences,
-      { pixelsPerNode, tree } = this.state,
+      { pixelsPerNode } = this.state,
       { paddingLeft, paddingRight, paddingBottom, paddingTop } = this.props,
       width = 900,
       height = pixelsPerNode * total_number_of_sequences;
@@ -105,7 +149,7 @@ class ReactTree extends Component {
                 Options
                 <span className="caret" />
               </button>
-              <ul className="dropdown-menu" id="hyphy-tree-model-list"></ul>
+              {this.props.options}
             </div>
 
             <div className="input-group-btn">
@@ -260,6 +304,8 @@ class ReactTree extends Component {
                     alignTips={this.state.alignTips}
                     internalNodeLabels={this.state.showInternal}
                     sort={this.state.sort}
+                    maxLabelWidth={30}
+                    accessor={this.props.accessor}
                   />
                 </svg>
               </div>
@@ -279,3 +325,4 @@ ReactTree.defaultProps = {
 };
 
 module.exports = ReactTree;
+module.exports.ModelsPartitionsList = ModelsPartitionsList;
