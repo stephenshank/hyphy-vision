@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Phylotree, { phylotreev1 } from "react-phylotree";
+import Phylotree, { phylotreev1, placenodes } from "react-phylotree";
 var download = require("in-browser-download");
 var d3_save_svg = require("d3-save-svg");
 
@@ -12,24 +12,63 @@ class ReactTree extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tree: new phylotreev1(props.newick),
-      pixels_per_node: 20
+      pixelsPerNode: 20,
+      alignTips: "left",
+      showInternal: false,
+      sort: null
     };
   }
   togglePixelsPerNode(direction) {
     const new_candidate =
-        this.state.pixels_per_node + (direction == "expand" ? 5 : -5),
-      new_pixels_per_node = Math.max(Math.min(new_candidate, 100), 10);
+        this.state.pixelsPerNode + (direction == "expand" ? 5 : -5),
+      new_pixelsPerNode = Math.max(Math.min(new_candidate, 100), 10);
     this.setState({
-      pixels_per_node: new_pixels_per_node
+      pixelsPerNode: new_pixelsPerNode
     });
+  }
+  alignTips(direction) {
+    this.setState({ alignTips: direction });
+  }
+  handleSort(direction) {
+    this.setState({ sort: direction });
+  }
+  exportNewick() {
+    const { newick } = this.props;
+    download(newick, "tree.new");
+  }
+  toggleInternal() {
+    const new_internal = !this.state.showInternal;
+    this.setState({
+      showInternal: new_internal
+    });
+  }
+  settingsMenu() {
+    var dropdownListStyle = {
+      paddingLeft: "20px",
+      paddingRight: "20px",
+      paddingTop: "10px",
+      paddingBottom: "10px"
+    };
+
+    return (
+      <ul className="dropdown-menu">
+        <li style={dropdownListStyle}>
+          <a onClick={() => this.toggleInternal()}>
+            {this.state.showInternal ? "Hide" : "Show"} internal node labels
+          </a>
+        </li>
+      </ul>
+    );
   }
   render() {
     const { number_of_sequences } = this.props,
-      { pixels_per_node, tree } = this.state,
+      total_number_of_sequences = this.state.showInternal
+        ? 2 * number_of_sequences - 2
+        : number_of_sequences,
+      { pixelsPerNode, tree } = this.state,
       { paddingLeft, paddingRight, paddingBottom, paddingTop } = this.props,
       width = 900,
-      height = pixels_per_node * number_of_sequences;
+      height = pixelsPerNode * total_number_of_sequences;
     return (
       <div>
         <h4 className="dm-table-header">
@@ -97,6 +136,7 @@ class ReactTree extends Component {
                 className="btn btn-secondary btn-sm"
                 id="sort_ascending"
                 title="Sort deepest clades to the bototm"
+                onClick={() => this.handleSort("ascending")}
               >
                 <i className="fa fa-sort-amount-asc" />
               </button>
@@ -105,24 +145,32 @@ class ReactTree extends Component {
                 className="btn btn-secondary btn-sm"
                 id="sort_descending"
                 title="Sort deepsest clades to the top"
+                onClick={() => this.handleSort("descending")}
               >
                 <i className="fa fa-sort-amount-desc" />
               </button>
             </div>
 
             <div className="btn-group-toggle" data-toggle="buttons">
-              <button className="btn btn-secondary active">
+              <button
+                className="btn btn-secondary active"
+                title="Align tips labels to branches"
+                onClick={() => this.alignTips("left")}
+              >
                 <input
                   type="radio"
                   className="phylotree-align-toggler"
                   data-align="left"
                   name="options-align"
                   autoComplete="off"
-                  title="Align tips labels to branches"
                 />
                 <i className="fa fa-align-left" />
               </button>
-              <button className="btn btn-secondary btn-sm">
+              <button
+                className="btn btn-secondary btn-sm"
+                title="Align tips labels to the edge of the plot"
+                onClick={() => this.alignTips("right")}
+              >
                 <input
                   type="radio"
                   className="phylotree-align-toggler"
@@ -144,6 +192,8 @@ class ReactTree extends Component {
               >
                 <i className="fas fa-cog" /> <span className="caret" />
               </button>
+
+              {this.settingsMenu()}
 
               <div className="input-group-btn float-right">
                 <button
@@ -180,7 +230,7 @@ class ReactTree extends Component {
                     </a>
                   </li>
                   <li id="export-phylo-nwk">
-                    <a onClick={this.exportNewick} href="javascript:;">
+                    <a onClick={() => this.exportNewick()} href="javascript:;">
                       <i className="fa fa-file-o" /> Newick File
                     </a>
                   </li>
@@ -203,10 +253,13 @@ class ReactTree extends Component {
                     fill="white"
                   />
                   <Phylotree
-                    tree={tree}
+                    newick={this.props.newick}
                     transform={`translate(${paddingLeft}, ${paddingTop})`}
                     width={width - paddingLeft - paddingRight}
                     height={height - paddingTop - paddingBottom}
+                    alignTips={this.state.alignTips}
+                    internalNodeLabels={this.state.showInternal}
+                    sort={this.state.sort}
                   />
                 </svg>
               </div>
