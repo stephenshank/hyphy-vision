@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Colorbar from "d3-react-colorbar";
 var ReactDOM = require("react-dom"),
   d3 = require("d3"),
   _ = require("underscore");
@@ -17,7 +18,6 @@ function MEMETree(props) {
   const [model, setModel] = useState("Global MG94xREV");
   const [ebf, setEbf] = useState(null);
   const [message, setMessage] = useState(null);
-  const [styler, setStyler] = useState(null);
   const { data } = props;
   if (!data) return null;
   const newick = data.input.trees[String(partition)];
@@ -33,6 +33,28 @@ function MEMETree(props) {
       branch_length = attributes[name][model];
     return branch_length;
   }
+
+  var styler;
+  if (ebf_data[ebf]) {
+    const current_partition = data["branch attributes"][String(partition)],
+      ebf_string = `EBF site ${ebf} (partition ${partition + 1})`,
+      branch_ebf_range = d3.extent(
+        _.values(current_partition).map(val => val[ebf_string])
+      ),
+      scale = scaleLog()
+        .domain([
+          branch_ebf_range[0],
+          Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
+          branch_ebf_range[1]
+        ])
+        .range(["#000000", "#EEEEEE", "#00A99D"]);
+    styler = node => {
+      return {
+        stroke: scale(current_partition[node.name][ebf_string])
+      };
+    };
+  } else styler = null;
+
   return (
     <ReactTree
       newick={newick}
@@ -56,25 +78,6 @@ function MEMETree(props) {
         <SettingsItem
           onClick={() => {
             setEbf(ebf == null ? ebf_range[0] : null);
-            const current_partition =
-                data["branch attributes"][String(partition)],
-              ebf_string = `EBF site ${ebf_range[0]} (partition ${partition +
-                1})`,
-              branch_ebf_range = d3.extent(
-                _.values(current_partition).map(val => val[ebf_string])
-              ),
-              scale = scaleLog()
-                .domain([
-                  branch_ebf_range[0],
-                  Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
-                  branch_ebf_range[1]
-                ])
-                .range(["#000000", "#EEEEEE", "#00A99D"]);
-            setStyler(() => node => {
-              return {
-                stroke: scale(current_partition[node.name][ebf_string])
-              };
-            });
           }}
         >
           {ebf == null ? "Show" : "Hide"} branch-wise EBF values
@@ -111,29 +114,10 @@ function MEMETree(props) {
                       content: "No variation at this site, so no EBFs."
                     });
                     setEbf(site);
-                    setStyler(null);
                   } else {
                     setMessage(null);
                     setEbf(site);
                     setPartition(partition - 1);
-                    const current_partition =
-                        data["branch attributes"][String(partition - 1)],
-                      ebf_string = `EBF site ${site} (partition ${partition})`,
-                      branch_ebf_range = d3.extent(
-                        _.values(current_partition).map(val => val[ebf_string])
-                      ),
-                      scale = scaleLog()
-                        .domain([
-                          branch_ebf_range[0],
-                          Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
-                          branch_ebf_range[1]
-                        ])
-                        .range(["#000000", "#EEEEEE", "#00A99D"]);
-                    setStyler(() => node => {
-                      return {
-                        stroke: scale(current_partition[node.name][ebf_string])
-                      };
-                    });
                   }
                 }}
               />
