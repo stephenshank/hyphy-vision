@@ -1318,6 +1318,12 @@ div.dc-chart {
   stroke-width: 10px;
 }
 
+path.rp-branch {
+  transition: d 0.5s;
+  fill: none;
+  shape-rendering: crispEdges;
+}
+
 .internal-node circle:hover,
 .internal-node ellipse:hover,
 .internal-node rect:hover {

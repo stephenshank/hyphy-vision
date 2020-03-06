@@ -224,7 +224,7 @@ class HyPhyVision extends React.Component {
                 <MEME
                   data={
                     this.state.data ||
-                    base_url + "/data/json_files/meme/h3_trunk.fna.MEME.json"
+                    base_url + "/data/json_files/meme/Flu.nex.MEME.json"
                   }
                 />
               )}

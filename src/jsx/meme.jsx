@@ -3,17 +3,30 @@ var ReactDOM = require("react-dom"),
   d3 = require("d3"),
   _ = require("underscore");
 
-import ReactTree, { ModelsPartitionsList } from "./components/react-tree.jsx";
+import ReactTree, {
+  ModelsPartitionsList,
+  SettingsItem
+} from "./components/react-tree.jsx";
 import { DatamonkeyTable, DatamonkeyModelTable } from "./components/tables.jsx";
 import { DatamonkeySiteGraph } from "./components/graphs.jsx";
 import { ResultsPage } from "./components/results_page.jsx";
+import { scaleLog } from "d3-scale";
 
 function MEMETree(props) {
   const [partition, setPartition] = useState(0);
   const [model, setModel] = useState("Global MG94xREV");
+  const [ebf, setEbf] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [styler, setStyler] = useState(null);
   const { data } = props;
   if (!data) return null;
   const newick = data.input.trees[String(partition)];
+  const ebf_data = _.object(
+      _.keys(data["branch attributes"]["attributes"])
+        .filter(datum => datum.slice(0, 3) == "EBF")
+        .map(datum => [+datum.split(" ")[2], +datum[datum.length - 2]])
+    ),
+    ebf_range = d3.extent(_.keys(ebf_data).map(d => +d));
   function accessor(node) {
     const name = node.data.name,
       attributes = data["branch attributes"][String(partition)],
@@ -25,9 +38,11 @@ function MEMETree(props) {
       newick={newick}
       accessor={accessor}
       number_of_sequences={props.data.input["number of sequences"]}
+      paddingLeft={ebf ? 100 : 10}
       popover={
         "<li>Use the options menu to toggle the different site partitions.</li>"
       }
+      branchStyler={styler}
       options={
         <ModelsPartitionsList
           number_of_partitions={_.keys(data.input.trees).length}
@@ -36,6 +51,108 @@ function MEMETree(props) {
           model={model}
           setModel={setModel}
         />
+      }
+      settings={
+        <SettingsItem
+          onClick={() => {
+            setEbf(ebf == null ? ebf_range[0] : null);
+            const current_partition =
+                data["branch attributes"][String(partition)],
+              ebf_string = `EBF site ${ebf_range[0]} (partition ${partition +
+                1})`,
+              branch_ebf_range = d3.extent(
+                _.values(current_partition).map(val => val[ebf_string])
+              ),
+              scale = scaleLog()
+                .domain([
+                  branch_ebf_range[0],
+                  Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
+                  branch_ebf_range[1]
+                ])
+                .range(["#000000", "#EEEEEE", "#00A99D"]);
+            setStyler(() => node => {
+              return {
+                stroke: scale(current_partition[node.name][ebf_string])
+              };
+            });
+          }}
+        >
+          {ebf == null ? "Show" : "Hide"} branch-wise EBF values
+        </SettingsItem>
+      }
+      between={
+        ebf != null ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginLeft: 20,
+              marginTop: 10,
+              marginBottom: 10
+            }}
+          >
+            <span>
+              Site to display:
+              <input
+                type="number"
+                value={ebf}
+                onChange={e => {
+                  const site = e.target.value,
+                    partition = ebf_data[site];
+                  if (site == "" || site == 0) {
+                    setMessage({
+                      type: "error",
+                      content: "Please enter a valid input (positive integer)."
+                    });
+                    setEbf("");
+                  } else if (!ebf_data[site]) {
+                    setMessage({
+                      type: "warning",
+                      content: "No variation at this site, so no EBFs."
+                    });
+                    setEbf(site);
+                    setStyler(null);
+                  } else {
+                    setMessage(null);
+                    setEbf(site);
+                    setPartition(partition - 1);
+                    const current_partition =
+                        data["branch attributes"][String(partition - 1)],
+                      ebf_string = `EBF site ${site} (partition ${partition})`,
+                      branch_ebf_range = d3.extent(
+                        _.values(current_partition).map(val => val[ebf_string])
+                      ),
+                      scale = scaleLog()
+                        .domain([
+                          branch_ebf_range[0],
+                          Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
+                          branch_ebf_range[1]
+                        ])
+                        .range(["#000000", "#EEEEEE", "#00A99D"]);
+                    setStyler(() => node => {
+                      return {
+                        stroke: scale(current_partition[node.name][ebf_string])
+                      };
+                    });
+                  }
+                }}
+              />
+            </span>
+            <span>
+              {message ? (
+                <div
+                  className={
+                    "alert alert-" +
+                    (message.type == "error" ? "danger" : "warning")
+                  }
+                  role="alert"
+                >
+                  <b> {message.type.toUpperCase()}: </b> {message.content}
+                </div>
+              ) : null}
+            </span>
+          </div>
+        ) : null
       }
     />
   );

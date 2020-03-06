@@ -5,8 +5,20 @@ var d3_save_svg = require("d3-save-svg");
 
 import { saveSvgAsPng } from "save-svg-as-png";
 
-require("phylotree");
-require("phylotree.css");
+function SettingsItem(props) {
+  return (
+    <li
+      style={{
+        paddingLeft: "20px",
+        paddingRight: "20px",
+        paddingTop: "10px",
+        paddingBottom: "10px"
+      }}
+    >
+      <a onClick={props.onClick}>{props.children}</a>
+    </li>
+  );
+}
 
 function ModelsPartitionsList(props) {
   return (
@@ -87,20 +99,12 @@ class ReactTree extends Component {
     });
   }
   settingsMenu() {
-    var dropdownListStyle = {
-      paddingLeft: "20px",
-      paddingRight: "20px",
-      paddingTop: "10px",
-      paddingBottom: "10px"
-    };
-
     return (
       <ul className="dropdown-menu">
-        <li style={dropdownListStyle}>
-          <a onClick={() => this.toggleInternal()}>
-            {this.state.showInternal ? "Hide" : "Show"} internal node labels
-          </a>
-        </li>
+        <SettingsItem onClick={() => this.toggleInternal()}>
+          {this.state.showInternal ? "Hide" : "Show"} internal node labels
+        </SettingsItem>
+        {this.props.settings}
       </ul>
     );
   }
@@ -288,7 +292,9 @@ class ReactTree extends Component {
           <div className="col-md-12">
             <div className="row">
               <div id="tree_container" className="tree-widget">
+                {this.props.between}
                 <svg id="dm-phylotree" width={width} height={height}>
+                  {this.props.svg}
                   <rect
                     x={0}
                     y={0}
@@ -306,6 +312,7 @@ class ReactTree extends Component {
                     sort={this.state.sort}
                     maxLabelWidth={30}
                     accessor={this.props.accessor}
+                    branchStyler={this.props.branchStyler}
                   />
                 </svg>
               </div>
@@ -326,3 +333,4 @@ ReactTree.defaultProps = {
 
 module.exports = ReactTree;
 module.exports.ModelsPartitionsList = ModelsPartitionsList;
+module.exports.SettingsItem = SettingsItem;

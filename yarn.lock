@@ -2624,7 +2624,7 @@ d3-array@1, d3-array@^1.1.1, d3-array@^1.2.0:
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-2.3.3.tgz#e90c39fbaedccedf59fc30473092f99a0e14efa2"
   integrity sha512-syv3wp0U5aB6toP2zb2OdBkhTy1MWDsCAaYk6OXJZv+G4u7bSWEmYgxLoFyc88RQUhZYGCebW9a9UD1gFi5+MQ==
 
-d3-array@^2.4.0:
+"d3-array@1.2.0 - 2", d3-array@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-2.4.0.tgz#87f8b9ad11088769c82b5ea846bcb1cc9393f242"
   integrity sha512-KQ41bAF2BMakf/HdKT865ALd4cgND6VcIztVQZUTt0+BH3RWy6ZYnHghVXf6NFjt2ritLr8H1T8LreAAlfiNcw==
@@ -2738,6 +2738,13 @@ d3-interpolate@1:
   dependencies:
     d3-color "1"
 
+d3-interpolate@^1.2.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/d3-interpolate/-/d3-interpolate-1.4.0.tgz#526e79e2d80daa383f9e0c1c1c7dcc0f0583e987"
+  integrity sha512-V9znK0zc3jOPV4VD2zZn0sDhZU3WAE2bmlxdIwwQPPzPjvyLkd8B3JUVdS1IDUFDkWZ72c9qnv1GK2ZagTZ8EA==
+  dependencies:
+    d3-color "1"
+
 d3-line@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/d3-line/-/d3-line-0.0.1.tgz#417091aa2a84792a3d50a09c60098c50b0714a89"
@@ -2773,6 +2780,16 @@ d3-react-axis@0.0.3:
     d3-axis "^1.0.12"
     react "^16.12.0"
 
+d3-react-colorbar@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/d3-react-colorbar/-/d3-react-colorbar-0.0.1.tgz#db3a028f53fca96db7bda7d7ca5d16e01478ab0f"
+  integrity sha512-PhusVYaeCCzg9BfbV9KnVvp1FUQ5mHkluDPD4hOJiELO2opunYDocKiBjH0YrsTNhNqHgVLzhquyAa6VgirZ0Q==
+  dependencies:
+    d3-array "^2.4.0"
+    d3-react-axis "0.0.3"
+    d3-scale "^3.2.1"
+    react "^16.12.0"
+
 d3-save-svg@0.0.2, d3-save-svg@^0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/d3-save-svg/-/d3-save-svg-0.0.2.tgz#74b35e82b943ea6c680f43498ac2eb3027823945"
@@ -2795,6 +2812,17 @@ d3-scale@2:
     d3-collection "1"
     d3-format "1"
     d3-interpolate "1"
+    d3-time "1"
+    d3-time-format "2"
+
+d3-scale@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-3.2.1.tgz#da1684adce7261b4bc7a76fe193d887f0e909e69"
+  integrity sha512-huz5byJO/6MPpz6Q8d4lg7GgSpTjIZW/l+1MQkzKfu2u8P6hjaXaStOpmyrD6ymKoW87d2QVFCKvSjLwjzx/rA==
+  dependencies:
+    d3-array "1.2.0 - 2"
+    d3-format "1"
+    d3-interpolate "^1.2.0"
     d3-time "1"
     d3-time-format "2"
 
@@ -8482,10 +8510,10 @@ react-phylotree@0.1.0:
     react-router-dom "^4.3.1"
     underscore "^1.9.1"
 
-react-phylotree@0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/react-phylotree/-/react-phylotree-0.4.0.tgz#2a8cc6c28f9d889d370db43946037695d01ea1d3"
-  integrity sha512-zcoyd0GDelq8YpYBuO4wTJq1rOUrtOSxyfF9ZaQzyA62vC2C+VBzPrw59hfz+1oASqAnDa9dQcguDsZ9nMkGUg==
+react-phylotree@0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/react-phylotree/-/react-phylotree-0.4.1.tgz#1cc771cbdf5b6c399d0c78587072a7b3d4a1eab5"
+  integrity sha512-9pOLPlN7tArotfKs6WFEJ0kAsHyJIE1VSo4caMHVah1PYYMI01Nchz+gVpA4PqSgbJbWNzaIc1E0Zkk5JL3OoQ==
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.10"
     "@fortawesome/free-solid-svg-icons" "^5.6.1"
