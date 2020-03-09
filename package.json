@@ -30,6 +30,7 @@
     "csvexport": "1.1.0",
     "d3": "3.x",
     "d3-array": "^2.4.0",
+    "d3-react-axis": "^0.0.3",
     "d3-react-colorbar": "^0.0.1",
     "d3-save-svg": "0.0.2",
     "d3-scale": "^3.2.1",

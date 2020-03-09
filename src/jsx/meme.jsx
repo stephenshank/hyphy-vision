@@ -14,19 +14,19 @@ import { ResultsPage } from "./components/results_page.jsx";
 import { scaleLog } from "d3-scale";
 
 function MEMETree(props) {
-  const [partition, setPartition] = useState(0);
-  const [model, setModel] = useState("Global MG94xREV");
-  const [ebf, setEbf] = useState(null);
-  const [message, setMessage] = useState(null);
   const { data } = props;
   if (!data) return null;
-  const newick = data.input.trees[String(partition)];
   const ebf_data = _.object(
       _.keys(data["branch attributes"]["attributes"])
         .filter(datum => datum.slice(0, 3) == "EBF")
         .map(datum => [+datum.split(" ")[2], +datum[datum.length - 2]])
     ),
     ebf_range = d3.extent(_.keys(ebf_data).map(d => +d));
+  const [partition, setPartition] = useState(0);
+  const [model, setModel] = useState("Global MG94xREV");
+  const [ebf, setEbf] = useState(ebf_range[0]);
+  const [message, setMessage] = useState(null);
+  const newick = data.input.trees[String(partition)];
   function accessor(node) {
     const name = node.data.name,
       attributes = data["branch attributes"][String(partition)],

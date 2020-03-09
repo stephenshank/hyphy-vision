@@ -2772,7 +2772,7 @@ d3-random@1:
   resolved "https://registry.yarnpkg.com/d3-random/-/d3-random-1.1.2.tgz#2833be7c124360bf9e2d3fd4f33847cfe6cab291"
   integrity sha512-6AK5BNpIFqP+cx/sreKzNjWbwZQCSUatxq+pPRmFIQaWuoD+NrbVWw7YWpHiXpCQ/NanKdtGDuB+VQcZDaEmYQ==
 
-d3-react-axis@0.0.3:
+d3-react-axis@0.0.3, d3-react-axis@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/d3-react-axis/-/d3-react-axis-0.0.3.tgz#416c555af7e8cab27977532c69c1f95deb82822a"
   integrity sha512-0ACWKkNoIVV1+LMM8ohgwmJvOd7+xXDneYE4YlbeCVGK/QcpLrO9bWoUWhY9cKxRlIXes3JGFVGPzcf88aVwLg==
