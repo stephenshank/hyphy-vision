@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Colorbar from "d3-react-colorbar";
 var ReactDOM = require("react-dom"),
   d3 = require("d3"),
   _ = require("underscore");
@@ -26,6 +25,7 @@ function MEMETree(props) {
   const [model, setModel] = useState("Global MG94xREV");
   const [ebf, setEbf] = useState(ebf_range[0]);
   const [message, setMessage] = useState(null);
+  const [threshold, setThreshold] = useState(1);
   const newick = data.input.trees[String(partition)];
   function accessor(node) {
     const name = node.data.name,
@@ -34,37 +34,46 @@ function MEMETree(props) {
     return branch_length;
   }
 
-  var styler;
-  if (ebf_data[ebf]) {
+  var branchStyler, labelStyler;
+  if (ebf != null && ebf_data[ebf]) {
     const current_partition = data["branch attributes"][String(partition)],
-      ebf_string = `EBF site ${ebf} (partition ${partition + 1})`,
-      branch_ebf_range = d3.extent(
-        _.values(current_partition).map(val => val[ebf_string])
-      ),
-      scale = scaleLog()
-        .domain([
-          branch_ebf_range[0],
-          Math.sqrt(branch_ebf_range[0] * branch_ebf_range[1]),
-          branch_ebf_range[1]
-        ])
-        .range(["#000000", "#EEEEEE", "#00A99D"]);
-    styler = node => {
+      ebf_string = `EBF site ${ebf} (partition ${partition + 1})`;
+    labelStyler = node => {
+      const ebf_value = current_partition[node.name][ebf_string],
+        above_threshold = ebf_value > threshold,
+        fill = above_threshold ? "red" : "lightgrey",
+        opacity = above_threshold ? 1 : 0.8;
       return {
-        stroke: scale(current_partition[node.name][ebf_string])
+        fill: fill,
+        opacity: opacity
       };
     };
-  } else styler = null;
-
+    branchStyler = node => {
+      const ebf_value = current_partition[node.name][ebf_string],
+        above_threshold = ebf_value > threshold,
+        stroke = above_threshold ? "red" : "lightgrey",
+        opacity = above_threshold ? 1 : 0.8;
+      return {
+        stroke: stroke,
+        opacity: opacity
+      };
+    };
+  } else {
+    branchStyler = null;
+    labelStyler = null;
+  }
   return (
     <ReactTree
       newick={newick}
       accessor={accessor}
       number_of_sequences={props.data.input["number of sequences"]}
-      paddingLeft={ebf ? 100 : 10}
+      paddingLeft={ebf == null ? 10 : 100}
       popover={
         "<li>Use the options menu to toggle the different site partitions.</li>"
       }
-      branchStyler={styler}
+      branchStyler={branchStyler}
+      labelStyler={labelStyler}
+      includeBLAxis
       options={
         <ModelsPartitionsList
           number_of_partitions={_.keys(data.input.trees).length}
@@ -91,37 +100,119 @@ function MEMETree(props) {
               justifyContent: "space-between",
               marginLeft: 20,
               marginTop: 10,
-              marginBottom: 10
+              marginBottom: 10,
+              height: 50
             }}
           >
             <span>
               Site to display:
               <input
-                type="number"
                 value={ebf}
-                onChange={e => {
-                  const site = e.target.value,
+                size={5}
+                onInput={e => {
+                  const site = +e.target.value,
                     partition = ebf_data[site];
-                  if (site == "" || site == 0) {
+                  if (isNaN(site) && site != "") {
                     setMessage({
                       type: "error",
                       content: "Please enter a valid input (positive integer)."
                     });
                     setEbf("");
+                  } else if (site == "") {
+                    setEbf("");
+                  } else if (site > ebf_range[1]) {
+                    setMessage({
+                      type: "warning",
+                      content: `Maximal site with EBf info is ${ebf_range[1]}.`
+                    });
+                    setEbf(ebf_range[1]);
+                  } else if (site < 1) {
+                    setMessage({
+                      type: "error",
+                      content: "Please enter a positive number."
+                    });
+                    setEbf(1);
                   } else if (!ebf_data[site]) {
                     setMessage({
                       type: "warning",
                       content: "No variation at this site, so no EBFs."
                     });
-                    setEbf(site);
+                    setEbf(+site);
                   } else {
                     setMessage(null);
-                    setEbf(site);
+                    setEbf(+site);
                     setPartition(partition - 1);
                   }
                 }}
               />
+              <i
+                className="fa fa-plus-circle"
+                aria-hidden="true"
+                onClick={e => {
+                  const new_ebf = ebf + 1;
+                  if (new_ebf < ebf_range[1] && ebf_data[new_ebf]) {
+                    setMessage(null);
+                    setEbf(new_ebf);
+                  } else if (new_ebf < ebf_range[1]) {
+                    setMessage({
+                      type: "warning",
+                      content: "No variation at this site, so no EBFs."
+                    });
+                    setEbf(new_ebf);
+                  } else {
+                    setMessage({
+                      type: "warning",
+                      content: `Maximal site with EBf info is ${ebf_range[1]}.`
+                    });
+                  }
+                }}
+              />
+              <i
+                className="fa fa-minus-circle"
+                aria-hidden="true"
+                onClick={e => {
+                  const new_ebf = ebf - 1;
+                  if (new_ebf > 0 && ebf_data[new_ebf]) {
+                    setMessage(null);
+                    setEbf(new_ebf);
+                  } else if (new_ebf > 0) {
+                    setMessage({
+                      type: "warning",
+                      content: "No variation at this site, so no EBFs."
+                    });
+                    setEbf(new_ebf);
+                  } else {
+                    setMessage({
+                      type: "warning",
+                      content: "Please enter a positive number."
+                    });
+                  }
+                }}
+              />
             </span>
+
+            <span>
+              <span style={{ width: 300, display: "inline-block" }}>
+                <span>EBF threshold:</span>
+                <input
+                  type="range"
+                  style={{ width: 180 }}
+                  min="0"
+                  max="10"
+                  step=".1"
+                  value={threshold}
+                  onChange={e => {
+                    setThreshold(e.target.value);
+                  }}
+                />
+              </span>
+              <span
+                style={{ width: 30, marginLeft: 10, display: "inline-block" }}
+              >
+                {d3.format("1.1f")(threshold)}
+              </span>
+            </span>
+
             <span>
               {message ? (
                 <div

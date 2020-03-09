@@ -313,6 +313,8 @@ class ReactTree extends Component {
                     maxLabelWidth={30}
                     accessor={this.props.accessor}
                     branchStyler={this.props.branchStyler}
+                    labelStyler={this.props.labelStyler}
+                    includeBLAxis={this.props.includeBLAxis}
                   />
                 </svg>
               </div>
